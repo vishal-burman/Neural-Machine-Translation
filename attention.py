@@ -1,4 +1,6 @@
-class Attention:
+import torch
+import torch.nn as nn
+class Attention(nn.Module):
     def __init__(self, enc_hid_dim, dec_hid_dim):
         super().__init__()
 
@@ -15,3 +17,6 @@ class Attention:
 
             # repeat decoder hidden state src_len times
             hidden=hidden.unsqueeze(1).repeat(1, src_len, 1)
+            # hidden=[batch_size, src_len, dec_hid_dim]
+
+            encoder_outputs=encoder_outputs.permute(1, 0, 2)

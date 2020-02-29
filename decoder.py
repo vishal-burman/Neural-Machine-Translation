@@ -26,3 +26,43 @@ class Decoder(nn.Module):
         # input_query=[1, batch_size]
 
         embedded = self.dropout(self.embedding(input_query))
+        # embedded=[1, batch_size, emb_dim]
+
+        a = self.attention(hidden, encoder_outputs)
+        # a=[batch_size, src_len]
+
+        a = a.unsqueeze(1)
+        # a=[batch_size, 1, src_len]
+
+        encoder_outputs = encoder_outputs.permute(1, 0, 2)
+        # encoder_outputs=[batch_size, src_len, enc_hid_dim*2]
+
+        weighted = torch.bmm(a, encoder_outputs)
+        # weighted=[batch_size, 1, enc_hid_dim*2]
+
+        weighted = weighted.permute(1, 0, 2)
+        # weighted=[1, batch_size, enc_hid_dim*2]
+
+        rnn_input = torch.cat((embedded, weighted), dim=2)
+        # rnn_input=[1, batch_size, enc_hid_dim*2+emb_dim]
+
+        output, hidden = self.rnn(rnn_input, hidden.unsqueeze(0))
+        # output=[seq_len, batch_size, dec_hid_dim*num_directions]
+        # hidden=[n_layers*n_directions, batch_size, dec_hid_dim]
+
+        # seq_len, n_layers and n_directions will always be 1 in this decoder
+        # output=[1, batch_size, dec_hid_dim]
+        # hidden=[1, batch_size, dec_hid_dim]
+        assert (output==hidden).all()
+
+        embedded=embedded.squeeze(0)
+        output=output.squeeze(0)
+        weighted=weighted.squeeze(0)
+        # embedded=[batch_size, emb_dim]
+        # output=[batch_size, dec_hid_dim]
+        # weighted=[batch_size, enc_hid_dim*2]
+
+        prediction=self.fc_out(torch.cat((output, weighted, embedded), dim=1))
+        # prediction=[batch_size, output_dim]
+
+        return prediction, hidden.squeeze(0)

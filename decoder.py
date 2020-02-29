@@ -53,16 +53,16 @@ class Decoder(nn.Module):
         # seq_len, n_layers and n_directions will always be 1 in this decoder
         # output=[1, batch_size, dec_hid_dim]
         # hidden=[1, batch_size, dec_hid_dim]
-        assert (output==hidden).all()
+        assert (output == hidden).all()
 
-        embedded=embedded.squeeze(0)
-        output=output.squeeze(0)
-        weighted=weighted.squeeze(0)
+        embedded = embedded.squeeze(0)
+        output = output.squeeze(0)
+        weighted = weighted.squeeze(0)
         # embedded=[batch_size, emb_dim]
         # output=[batch_size, dec_hid_dim]
         # weighted=[batch_size, enc_hid_dim*2]
 
-        prediction=self.fc_out(torch.cat((output, weighted, embedded), dim=1))
+        prediction = self.fc_out(torch.cat((output, weighted, embedded), dim=1))
         # prediction=[batch_size, output_dim]
 
         return prediction, hidden.squeeze(0)

@@ -158,7 +158,7 @@ def epoch_time(start_time, end_time):
 N_EPOCHS = 10
 CLIP = 1
 best_valid_loss = float('inf')
-for epoch in tqdm(range(N_EPOCHS)):
+for epoch in range(N_EPOCHS):
 
     start_time = time.time()
 

@@ -2,7 +2,9 @@ import random
 
 import torch
 import torch.nn as nn
-device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class Seq2Seq(nn.Module):
     def __init__(self, encoder, decoder, device):
@@ -50,4 +52,3 @@ class Seq2Seq(nn.Module):
             input = trg[t] if teacher_force else top1
 
         return outputs
-   
